@@ -5921,6 +5921,17 @@ var $elm$core$Maybe$withDefault = F2(
 var $author$project$Card$correct = function (c) {
 	return A2($elm$core$Maybe$withDefault, false, c.O);
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $author$project$Alpha$Alpha = $elm$core$Basics$identity;
 var $elm$core$Char$fromCode = _Char_fromCode;
 var $author$project$Alpha$lowerACode = $elm$core$Char$toCode('a');
@@ -5943,8 +5954,8 @@ var $author$project$Alpha$fromValToStr = function (val) {
 	return $author$project$Alpha$toStr(
 		$author$project$Alpha$fromVal(val));
 };
-var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -6199,6 +6210,49 @@ var $myrho$elm_round$Round$round = $myrho$elm_round$Round$roundFun(
 				}
 			}
 		}));
+var $elm$core$String$fromList = _String_fromList;
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$Common$letterACode = $elm$core$Char$toCode('a');
+var $author$project$Common$letterZCode = $elm$core$Char$toCode('z');
+var $elm$core$Char$toLower = _Char_toLower;
+var $author$project$Common$toLetterIndex = function (letter) {
+	var code = $elm$core$Char$toCode(
+		$elm$core$Char$toLower(letter));
+	return ((_Utils_cmp(code, $author$project$Common$letterACode) > -1) && (_Utils_cmp(code, $author$project$Common$letterZCode) < 1)) ? $elm$core$Maybe$Just(code - $author$project$Common$letterACode) : $elm$core$Maybe$Nothing;
+};
+var $author$project$Common$toLetterIndexUnsafe = function (letter) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		-1,
+		$author$project$Common$toLetterIndex(letter));
+};
+var $author$project$Main$toBaconianBinary = function (n) {
+	var n_ = (_Utils_cmp(
+		n,
+		$author$project$Common$toLetterIndexUnsafe('v')) > -1) ? (n - 2) : ((_Utils_cmp(
+		n,
+		$author$project$Common$toLetterIndexUnsafe('j')) > -1) ? (n - 1) : n);
+	return $elm$core$String$reverse(
+		$elm$core$String$fromList(
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (pv, _v0) {
+						var cur = _v0.a;
+						var bs = _v0.b;
+						return (_Utils_cmp(cur, pv) > -1) ? _Utils_Tuple2(
+							cur - pv,
+							A2($elm$core$List$cons, 'B', bs)) : _Utils_Tuple2(
+							cur,
+							A2($elm$core$List$cons, 'A', bs));
+					}),
+				_Utils_Tuple2(n_, _List_Nil),
+				_List_fromArray(
+					[16, 8, 4, 2, 1])).b));
+};
 var $author$project$Main$createCards = F2(
 	function (deck, filter) {
 		var _v0 = function () {
@@ -6288,7 +6342,7 @@ var $author$project$Main$createCards = F2(
 						};
 					},
 					A2($elm$core$List$range, startIdx, endIdx));
-			default:
+			case 5:
 				return A2(
 					$elm$core$List$map,
 					function (n) {
@@ -6302,6 +6356,25 @@ var $author$project$Main$createCards = F2(
 						};
 					},
 					A2($elm$core$List$range, startIdx, endIdx));
+			default:
+				return A2(
+					$elm$core$List$map,
+					function (n) {
+						return {
+							aB: $author$project$Alpha$fromValToStr(n),
+							aF: 'letter?',
+							O: $elm$core$Maybe$Nothing,
+							P: $elm$core$Maybe$Nothing,
+							aR: $author$project$Main$toBaconianBinary(n),
+							V: $elm$core$Maybe$Nothing
+						};
+					},
+					A2(
+						$elm$core$List$filter,
+						function (n) {
+							return !((n === 9) || (n === 21));
+						},
+						A2($elm$core$List$range, startIdx, endIdx)));
 		}
 	});
 var $author$project$Main$difficultyNumMistakesAllowed = function (d) {
@@ -6432,10 +6505,6 @@ var $author$project$CardResult$addCard = F2(
 						]))
 			});
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $elm$core$List$sum = function (numbers) {
 	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
 };
@@ -6931,7 +7000,8 @@ var $author$project$Main$update = F2(
 								$author$project$Main$ShowResultsScreen(
 									{
 										f: s.f,
-										z: $author$project$CardResult$fromCards(s.h)
+										z: $author$project$CardResult$fromCards(
+											A2($elm$core$List$cons, c, s.h))
 									}),
 								$elm$core$Platform$Cmd$none) : ($author$project$Main$canHandleAnotherMistake(s) ? _Utils_Tuple2(
 								$author$project$Main$RunTestScreen(
@@ -7172,10 +7242,11 @@ var $author$project$Main$AffineToLetter = 5;
 var $author$project$Main$AffineToNumber = 4;
 var $author$project$Main$AtbashToLetter = 3;
 var $author$project$Main$AtbashToNumber = 2;
+var $author$project$Main$BaconianABToLetter = 6;
 var $author$project$Main$LetterToNum = 0;
 var $author$project$Main$NumToLetter = 1;
 var $author$project$Main$decks = _List_fromArray(
-	[0, 1, 2, 3, 4, 5]);
+	[0, 1, 2, 3, 4, 5, 6]);
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
@@ -7199,8 +7270,10 @@ var $author$project$Main$deckStr = function (d) {
 			return '[Atbash] Letter → Letter';
 		case 4:
 			return '[Affine] MOD26 → Number';
-		default:
+		case 5:
 			return '[Affine] MOD26 → Letter';
+		default:
+			return '[Baconian] A&B-Code → Letter';
 	}
 };
 var $author$project$Main$SelectDeck = function (a) {
